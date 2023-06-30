@@ -53,7 +53,6 @@ class Recipe(models.Model):
     )
     tags = models.ManyToManyField(
         Tag,
-        through='TagRecipe',
         related_name='recipes'
     )
     cooking_time = models.IntegerField(
@@ -87,20 +86,20 @@ class IngredientRecipe(models.Model):
         return f'{self.ingredient} {self.recipe}'
 
 
-class TagRecipe(models.Model):
-    """Связь моделей Tag и Recipe."""
+# class TagRecipe(models.Model):
+#     """Связь моделей Tag и Recipe."""
 
-    tag = models.ForeignKey(
-        Tag,
-        on_delete=models.CASCADE
-    )
-    recipe = models.ForeignKey(
-        Recipe,
-        on_delete=models.CASCADE
-    )
+#     tag = models.ForeignKey(
+#         Tag,
+#         on_delete=models.CASCADE
+#     )
+#     recipe = models.ForeignKey(
+#         Recipe,
+#         on_delete=models.CASCADE
+#     )
 
-    def __str__(self):
-        return f'{self.tag} {self.recipe}'
+#     def __str__(self):
+#         return f'{self.tag} {self.recipe}'
 
 
 class ShoppingCart(models.Model):
@@ -120,6 +119,12 @@ class ShoppingCart(models.Model):
     class Meta:
         verbose_name = 'Покупка'
         verbose_name_plural = 'Покупки'
+        constraints = [
+            models.UniqueConstraint(
+                fields=('user', 'recipe'),
+                name='unique shoppingcart'
+            )
+        ]
 
     def __str__(self):
         return f'{self.user} {self.recipe}'
@@ -142,6 +147,12 @@ class Favorite(models.Model):
     class Meta:
         verbose_name = 'Избранное'
         verbose_name_plural = 'Избранное'
+        constraints = [
+            models.UniqueConstraint(
+                fields=('user', 'recipe'),
+                name='unique favorite'
+            )
+        ]
 
     def __str__(self):
         return f'{self.user} {self.recipe}'

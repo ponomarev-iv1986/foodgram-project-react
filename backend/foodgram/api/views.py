@@ -1,18 +1,24 @@
+from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
-from recipes.models import Favorite, Ingredient, Recipe, ShoppingCart, Tag
 from rest_framework import mixins, serializers, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import (AllowAny, IsAuthenticated,
                                         IsAuthenticatedOrReadOnly)
 from rest_framework.response import Response
 
+from recipes.models import Favorite, Ingredient, Recipe, ShoppingCart, Tag
+from users.models import Subscription
+
 from .filters import IngredientFilter, RecipeFilter
 from .permission import IsAuthorOrAdmin
 from .serializers import (FavoriteSerializer, IngredientSerializer,
                           RecipeCreateSerializer, RecipeListRetrieveSerializer,
-                          ShoppingCartSerializer, TagSerializer)
+                          ShoppingCartSerializer, ShowSubscriptionsSerializer,
+                          SubscribeSerializer, TagSerializer)
 from .utils import download_cart
+
+User = get_user_model()
 
 
 class TagViewSet(viewsets.ReadOnlyModelViewSet):
@@ -101,4 +107,43 @@ class FavoriteViewSet(mixins.CreateModelMixin,
         favorite = get_object_or_404(
             Favorite, user=request.user, recipe=recipe)
         favorite.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class ListSubscriptionViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
+    serializer_class = ShowSubscriptionsSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def get_queryset(self):
+        user = self.request.user
+        return User.objects.filter(subscriptions__user=user)
+
+
+class SubscribeViewSet(mixins.CreateModelMixin,
+                       mixins.DestroyModelMixin,
+                       viewsets.GenericViewSet):
+    queryset = Subscription.objects.all()
+    serializer_class = SubscribeSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def perform_create(self, serializer):
+        author = get_object_or_404(User, id=self.kwargs['user_id'])
+        user = self.request.user
+        if Subscription.objects.filter(
+            user=user, author=author
+        ).exists():
+            raise serializers.ValidationError(
+                'Подписка на пользователя уже есть.'
+            )
+        if user == author:
+            raise serializers.ValidationError(
+                'Нельзя подписаться на самого себя.'
+            )
+        serializer.save(user=self.request.user, author=author)
+
+    def delete(self, request, user_id):
+        author = get_object_or_404(User, id=user_id)
+        subscription = get_object_or_404(
+            Subscription, user=request.user, author=author)
+        subscription.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)

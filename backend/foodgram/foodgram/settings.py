@@ -25,12 +25,13 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-2+n4^l2%j3vn5!=c_r2k2&*ieb8oe&huuzg03qyldi6l5#)nfo'
+SECRET_KEY = os.getenv('SECRET_KEY',
+                       'django-insecure-2+n4^l2%j3vn5!=c_r2k2&*ieb8oe&huuzg03qyldi6l5#)nfo')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.getenv('DEBUG', 'False').lower() == 'true'
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [os.getenv('PROD_HOST', '127.0.0.1')]
 
 
 # Application definition
@@ -96,6 +97,11 @@ DATABASES = {
         'PORT': os.getenv('DB_PORT', '5432')
     }
 }
+
+
+# Custom User model
+
+AUTH_USER_MODEL = 'users.User'
 
 
 # Password validation
@@ -170,13 +176,13 @@ REST_FRAMEWORK = {
 DJOSER = {
     'LOGIN_FIELD': 'email',
     'SERIALIZERS': {
-        'user': 'users.serializers.CustomUserSerializer',
-        'current_user': 'users.serializers.CustomUserSerializer',
-        'user_create': 'users.serializers.CustomUserCreateSerializer',
-        'set_password': 'users.serializers.CustomSetPasswordSerializer',
+        'user': 'api.serializers.CustomUserSerializer',
+        'current_user': 'api.serializers.CustomUserSerializer',
+        'user_create': 'api.serializers.CustomUserCreateSerializer',
+        'set_password': 'api.serializers.CustomSetPasswordSerializer',
     },
     'PERMISSIONS': {
-        'user': ['rest_framework.permissions.AllowAny'],
+        'user': ['djoser.permissions.CurrentUserOrAdminOrReadOnly'],
         'user_list': ['rest_framework.permissions.AllowAny'],
     },
     'HIDE_USERS': False,

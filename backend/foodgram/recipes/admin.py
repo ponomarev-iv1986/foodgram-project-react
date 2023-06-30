@@ -1,12 +1,10 @@
 from django.contrib import admin
 
-from .models import (Favorite, Ingredient, IngredientRecipe, Recipe, Tag,
-                     TagRecipe)
+from .models import Favorite, Ingredient, IngredientRecipe, Recipe, Tag
 
-
-class TagInLine(admin.TabularInline):
-    model = TagRecipe
-    extra = 3
+# class TagInLine(admin.TabularInline):
+#     model = TagRecipe
+#     extra = 3
 
 
 class IngredientInLine(admin.TabularInline):
@@ -18,7 +16,7 @@ class IngredientInLine(admin.TabularInline):
 class RecipeAdmin(admin.ModelAdmin):
     list_display = ['name', 'author', 'favorites']
     list_filter = ['name', 'author', 'tags']
-    inlines = (TagInLine, IngredientInLine)
+    inlines = (IngredientInLine,)
 
     def favorites(self, obj):
         if Favorite.objects.filter(recipe=obj).exists():
