@@ -6,10 +6,9 @@ from django.db.models import F
 from django.shortcuts import get_object_or_404
 from djoser.serializers import (SetPasswordSerializer, UserCreateSerializer,
                                 UserSerializer)
-from rest_framework import serializers
-
 from recipes.models import (Favorite, Ingredient, IngredientRecipe, Recipe,
                             ShoppingCart, Tag)
+from rest_framework import serializers
 from users.models import Subscription
 
 User = get_user_model()
