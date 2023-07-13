@@ -132,7 +132,7 @@ dmypy.json
 .idea
 
 media/
-static/
+# static/
 
 .DS_Store
 .vscode/
