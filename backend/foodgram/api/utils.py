@@ -1,11 +1,10 @@
 from io import BytesIO
 
 from django.http import FileResponse
+from foodgram.settings import BASE_DIR
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.pdfgen import canvas
-
-from foodgram.settings import BASE_DIR
 
 from .serializers import IngredientRecipe
 
