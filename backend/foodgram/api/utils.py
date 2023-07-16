@@ -5,6 +5,8 @@ from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.pdfgen import canvas
 
+from foodgram.settings import BASE_DIR
+
 from .serializers import IngredientRecipe
 
 
@@ -21,7 +23,9 @@ def download_cart(request):
             cart_list[name]["amount"] += amount
     height = 700
     buffer = BytesIO()
-    pdfmetrics.registerFont(TTFont('arial', 'arial.ttf'))
+    pdfmetrics.registerFont(
+        TTFont('arial', f'{BASE_DIR}/static/fonts/arial.ttf')
+    )
     page = canvas.Canvas(buffer)
     page.setFont('arial', 14)
     page.drawString(100, 750, "Список покупок")
