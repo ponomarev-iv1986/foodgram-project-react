@@ -12,9 +12,6 @@ services:
 
   backend:
     image: ponomarev1986/foodgram_backend:latest
-    build:
-      context: ../backend/foodgram
-      dockerfile: Dockerfile
     volumes:
       - static_value:/app/static/
       - media_value:/app/media/
@@ -26,9 +23,6 @@ services:
 
   frontend:
     image: ponomarev1986/foodgram_frontend:latest
-    build:
-      context: ../frontend
-      dockerfile: Dockerfile
     volumes:
       - ../frontend/:/app/result_build/
     depends_on:
