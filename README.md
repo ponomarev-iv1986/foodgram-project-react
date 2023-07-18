@@ -12,13 +12,41 @@
 - Nginx
 - PostgreSQL
 
-### Проект доступен по адресу:
-http://51.250.10.2/
+### Как запустить проект:
 
-### Учетные данные для проверки:
+Клонировать репозиторий:
 ```
-Почта: admin@mail.ru
-Пароль: Admin123456
+git clone https://github.com/ponomarev-iv1986/foodgram-project-react.git
+```
+
+Подготовить сервер:
+```
+scp docker-compose.yml <username>@<host>:/home/<username>/
+scp nginx.conf <username>@<host>:/home/<username>/
+scp .env <username>@<host>:/home/<username>/
+```
+
+Установить docker и docker-compose:
+```
+sudo apt install docker.io 
+sudo apt install docker-compose
+```
+
+Собрать контейнер и выполнить миграции:
+```
+sudo docker-compose up -d --build
+sudo docker-compose exec backend python manage.py migrate
+```
+
+Создать суперюзера и собрать статику:
+```
+sudo docker-compose exec backend python manage.py createsuperuser
+sudo docker-compose exec backend python manage.py collectstatic --no-input
+```
+
+Для того, чтобы наполнить БД ингредиентами, выполнить команду:
+```
+sudo docker-compose exec backend python manage.py load_ingredients --path 'data/ingredients.json'
 ```
 
 ![yamdb_workflow](https://github.com/ponomarev-iv1986/yamdb_final/actions/workflows/yamdb_workflow.yml/badge.svg)
